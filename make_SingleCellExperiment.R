@@ -36,6 +36,12 @@ sce <- SingleCellExperiment(mat, colData=DataFrame(ImageNb=image_id_vector, Pos_
 
 pancreasSCE <- buildSpatialGraph(sce, img_id = "ImageNb", type = "knn", k = 3)
 
+out <- testInteractions(pancreasSCE, group_by = "ImageNb", label = "CellType", method = "histocat", colPairName = "knn_interaction_graph", iter = 1000)) #, BPPARAM = SerialParam(RNGseed = 123
+
+save(out, file='/mnt/data1/fatema/out.Rda')
+
+load(file='/mnt/data1/fatema/out.Rda')
+write.csv(out, "/mnt/data1/fatema/out.csv", row.names=FALSE
 
 ############################################################
 counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
