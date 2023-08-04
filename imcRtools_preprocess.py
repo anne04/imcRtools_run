@@ -8,10 +8,11 @@ import numpy as np
 import sys
 
 df_aanchal_label = pd.read_csv('/mnt/data1/gw/research/sc_integration/labels/labels_aanchal_imc_updated_1.csv', sep=",", header=0,index_col=0) 
-label_dictionaly = dict()
+label_dictionary = dict()
+detected_status = []
 for i in range (0, len(df_aanchal_label.index)):
-    label_dictionaly[df_aanchal_label.index[i]] = df_aanchal_label['label'][df_aanchal_label.index[i]]
-
+    label_dictionary[df_aanchal_label.index[i]] = df_aanchal_label['label'][df_aanchal_label.index[i]]
+    detected_status.append((df_aanchal_label.index[i]).split('-')[2])
 
 df = pd.read_csv('/mnt/data1/gw/research/sc_integration/data/imc/raw_data/mgDF.csv', sep=",", header=0,index_col=0) 
 # seperate the protein names, (x, y), and cell names
@@ -38,8 +39,8 @@ for j in range (0, len(cell_name)):
     file_name.append(df['TIFFfilename'][cell])
     status_list.append(df['Status'][cell])
     cell_key = str(j+1)+'-'+file_name[j] + '-' + status_list[j]
-    if cell_key in label_dictionaly:
-        cell_label.append(label_dictionaly[cell_key])
+    if cell_key in label_dictionary:
+        cell_label.append(label_dictionary[cell_key])
     else:
         cell_label.append('not_defined')
         not_defined_cell_count = not_defined_cell_count + 1
@@ -63,7 +64,7 @@ df = pd.DataFrame(file_name)
 df.to_csv('mnt/data1/fatema/file_name_mgDF.csv', index=False, header=False)
 
 df = pd.DataFrame(status_list)
-df.to_csv('mnt/data1/fatema/status_list_mgDF.csv', index=False, header=False)
+df.to_csv('/mnt/data1/fatema/status_list_mgDF.csv', index=False, header=False)
 
 df = pd.DataFrame(x_coord)
 df.to_csv('mnt/data1/fatema/x_coord_mgDF.csv', index=False, header=False)
@@ -71,7 +72,19 @@ df.to_csv('mnt/data1/fatema/x_coord_mgDF.csv', index=False, header=False)
 df = pd.DataFrame(y_coord)
 df.to_csv('mnt/data1/fatema/y_coord_mgDF.csv', index=False, header=False)
 
-
 df = pd.DataFrame(cell_label)
 df.to_csv('/mnt/data1/fatema/cell_label_mgDF.csv', index=False, header=False)
-   
+###########################################################################################
+
+cell_label=[]
+with open('/mnt/data1/fatema/cell_label_mgDF.csv') as file:
+    csv_file = csv.reader(file, delimiter=",")
+    for line in csv_file:
+        cell_label.append(line[0])
+        
+status_list=[]
+with open('/mnt/data1/fatema/status_list_mgDF.csv') as file:
+    csv_file = csv.reader(file, delimiter=",")
+    for line in csv_file:
+        status_list.append(line[0])
+       
