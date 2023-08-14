@@ -10,9 +10,11 @@ import sys
 df_aanchal_label = pd.read_csv('/mnt/data1/gw/research/sc_integration/labels/labels_aanchal_imc_updated_1.csv', sep=",", header=0,index_col=0) 
 label_dictionary = dict()
 detected_status = []
-for i in range (0, len(df_aanchal_label.index)):
+islet = ['Alpha_Cells', 'Beta_Cells', 'Delta_Cells', 'Eplsilon_Cells', 'Gamma_Cells']
+for i in range (0, len(df_aanchal_label.index)): 
     label_dictionary[df_aanchal_label.index[i]] = df_aanchal_label['label'][df_aanchal_label.index[i]]
     detected_status.append((df_aanchal_label.index[i]).split('-')[2])
+
 
 df = pd.read_csv('/mnt/data1/gw/research/sc_integration/data/imc/raw_data/mgDF.csv', sep=",", header=0,index_col=0) 
 # seperate the protein names, (x, y), and cell names
@@ -39,11 +41,21 @@ for j in range (0, len(cell_name)):
     file_name.append(df['TIFFfilename'][cell])
     status_list.append(df['Status'][cell])
     cell_key = str(j+1)+'-'+file_name[j] + '-' + status_list[j]
-    if cell_key in label_dictionary:
-        cell_label.append(label_dictionary[cell_key])
+    if cell_key in label_dictionary:   
+        # mark all the greek letter cell types as 'Islet_Cells'
+        label = ''
+        if label_dictionary[cell_key] in islet:
+            label = 'Islet_Cells'
+        else:
+            label = label_dictionary[cell_key]
+                   
+        cell_label.append(label)
     else:
         cell_label.append('not_defined')
         not_defined_cell_count = not_defined_cell_count + 1
+
+print('unique cell label: %d'%len(set(cell_label)))
+print(set(cell_label))
 
 gene_vs_cell = np.zeros((len(protein_name),len(cell_name)))
 for i in range (0, len(protein_name)):
@@ -73,7 +85,9 @@ df = pd.DataFrame(y_coord)
 df.to_csv('mnt/data1/fatema/y_coord_mgDF.csv', index=False, header=False)
 
 df = pd.DataFrame(cell_label)
-df.to_csv('/mnt/data1/fatema/cell_label_mgDF.csv', index=False, header=False)
+df.to_csv('/mnt/data1/fatema/cell_label_islets_mgDF.csv', index=False, header=False)
+#df.to_csv('/mnt/data1/fatema/cell_label_mgDF.csv', index=False, header=False)
+
 ###########################################################################################
 
 cell_label=[]
