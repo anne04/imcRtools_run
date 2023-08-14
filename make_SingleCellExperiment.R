@@ -2,7 +2,7 @@ library(reticulate)
 library(SingleCellExperiment)
 np <- import("numpy")
 library(imcRtools)
-
+library('BiocParallel')
 
 mat <- np$load("/mnt/data1/fatema/gene_vs_cell_count_mgDF.npy")
 
