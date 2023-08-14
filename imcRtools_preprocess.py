@@ -81,12 +81,6 @@ df.to_csv('/mnt/data1/fatema/cell_label_islets_mgDF.csv', index=False, header=Fa
 #df.to_csv('/mnt/data1/fatema/cell_label_mgDF.csv', index=False, header=False)
 ##########################################################################################
 
-
-
-status_list_interest = ['GAD+', 'GAD-', 'T1D']
-for status_type in status_list_interest:
-###########################################################################################
-
 cell_label=[]
 with open('/mnt/data1/fatema/cell_label_islets_mgDF.csv') as file:
     csv_file = csv.reader(file, delimiter=",")
