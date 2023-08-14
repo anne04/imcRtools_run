@@ -1,11 +1,3 @@
-import os
-#import glob
-import pandas as pd
-#import shutil
-import copy
-import csv
-import numpy as np
-import sys
 
 df_aanchal_label = pd.read_csv('/mnt/data1/gw/research/sc_integration/labels/labels_aanchal_imc_updated_1.csv', sep=",", header=0,index_col=0) 
 label_dictionary = dict()
@@ -87,11 +79,16 @@ df.to_csv('mnt/data1/fatema/y_coord_mgDF.csv', index=False, header=False)
 df = pd.DataFrame(cell_label)
 df.to_csv('/mnt/data1/fatema/cell_label_islets_mgDF.csv', index=False, header=False)
 #df.to_csv('/mnt/data1/fatema/cell_label_mgDF.csv', index=False, header=False)
+##########################################################################################
 
+
+
+status_list_interest = ['GAD+', 'GAD-', 'T1D']
+for status_type in status_list_interest:
 ###########################################################################################
 
 cell_label=[]
-with open('/mnt/data1/fatema/cell_label_mgDF.csv') as file:
+with open('/mnt/data1/fatema/cell_label_islets_mgDF.csv') as file:
     csv_file = csv.reader(file, delimiter=",")
     for line in csv_file:
         cell_label.append(line[0])
@@ -101,4 +98,20 @@ with open('/mnt/data1/fatema/status_list_mgDF.csv') as file:
     csv_file = csv.reader(file, delimiter=",")
     for line in csv_file:
         status_list.append(line[0])
-       
+
+file_name=[]
+with open('/mnt/data1/fatema/file_name_mgDF.csv') as file:
+    csv_file = csv.reader(file, delimiter=",")
+    for line in csv_file:
+        file_name.append(line[0])
+
+file_name_list = list(set(file_name))
+for file_id in file_name_list:
+    status_list_temp = []
+    for cell_serial in range (0, len(file_name)):
+        if file_id == file_name[cell_serial]:
+            status_list_temp.append(status_list[cell_serial])
+    print('unique status in file %s is %d'%(file_id, len(set(status_list_temp))))
+
+# each file belongs to one status
+
