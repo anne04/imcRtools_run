@@ -232,7 +232,7 @@ chart =alt.Chart(df).transform_density(
     
 ).mark_area(opacity=0.5).encode(
     alt.X('ct:Q'),
-    alt.Y('density:Q', stack='zero' ),
+    alt.Y('density:Q' ), #, stack='zero'
     alt.Color('Distribution_type:N')
 )
 
