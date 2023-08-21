@@ -90,6 +90,7 @@ with open('/mnt/data1/fatema/out.csv') as file:
 from collections import defaultdict
 
 ROI_control_Islet_Islet_ct = dict() # column 3
+box_plot_ct = defaultdict(list)
 ROI_control_ct_distribution = defaultdict(list)
 file_name_list = []
 for i in range (1, len(out_histocat)):
@@ -99,6 +100,8 @@ for i in range (1, len(out_histocat)):
             if out_histocat[i][9] != 'NA': #= '1':
                 ROI_control_ct_distribution['Distribution_type'].append('Islet vs Islet cells in Control')
                 ROI_control_ct_distribution['ct'].append(float(out_histocat[i][3]))
+                box_plot_ct['y'].append(3.0)
+                box_plot_ct['ct'].append(float(out_histocat[i][3]))
                 file_name_list.append(out_histocat[i][0])
                 ROI_control_Islet_Islet_ct[out_histocat[i][0]] = [out_histocat[i][3], out_histocat[i][9]]
                 print('%s, %g'%(out_histocat[i][0], float(out_histocat[i][3])))
@@ -109,7 +112,7 @@ for i in range (1, len(out_histocat)):
 #################### draw density plot of ct values for islet vs islet cells in control ###############
 
 df = pd.DataFrame(ROI_control_ct_distribution)
-chart = alt.Chart(df).transform_density(
+chart1 = alt.Chart(df).transform_density(
     'ct',
     as_=['ct', 'density'],
     groupby=['Distribution_type'],
@@ -117,7 +120,7 @@ chart = alt.Chart(df).transform_density(
     #counts = True,
     #steps=100
     
-).mark_area(opacity=0.5).encode(
+).mark_area(opacity=0.7).encode(
     alt.X('ct:Q'),
     alt.Y('density:Q', stack='zero' ),
     alt.Color('Distribution_type:N')
@@ -125,20 +128,17 @@ chart = alt.Chart(df).transform_density(
 
 
 #chart.save(save_path+'density_plot_islet_vs_islet_control_sigval1.html')
-chart.save(save_path+'density_plot_islet_vs_islet_control_sigval_any.html')
+chart1.save(save_path+'density_plot_islet_vs_islet_control_sigval_any.html')
 
-
-import altair as alt
-from vega_datasets import data
-
-source = data.cars()
-
-chart = alt.Chart(df).mark_boxplot(extent="min-max").encode(
-    alt.X("ct:Q").scale(zero=False)
-    #alt.Y("Origin:N"),
+df = pd.DataFrame(box_plot_ct)
+chart2 = alt.Chart(df).mark_boxplot(extent="min-max", opacity=0.7).encode(
+    alt.X("ct:Q", stack='zero' ).scale(zero=False), 
+    #alt.Y("y:N", stack='zero' ),
 )
-chart.save(save_path+'box_plot_minmax_islet_vs_islet_control_sigval_any.html')
+chart2.save(save_path+'box_plot_minmax_islet_vs_islet_control_sigval_any.html')
 
+chart = alt.layer(chart1, chart2)
+chart.save(save_path+'box_and_density_islet_vs_islet_control_sigval_any.html')
 
 
 
@@ -213,11 +213,10 @@ for i in range (1, len(out_histocat)):
             else: #0, -1, NA
                 continue
 
-#################### draw density plot of ct values for islet vs islet cells in control ###############
-
+#################### draw density plot of ct values for islet vs acinar cells in control ###############
 
 df = pd.DataFrame(ROI_control_ct_distribution)
-chart =alt.Chart(df).transform_density(
+chart1 =alt.Chart(df).transform_density(
     'ct',
     as_=['ct', 'density'],
     groupby=['Distribution_type'],
@@ -225,14 +224,25 @@ chart =alt.Chart(df).transform_density(
     #counts = True,
     #steps=100
     
-).mark_area(opacity=0.5).encode(
+).mark_area(opacity=0.7).encode(
     alt.X('ct:Q'),
     alt.Y('density:Q', stack='zero' ),
     alt.Color('Distribution_type:N')
 )
 
-#chart.save(save_path+'density_plot_islet_vs_acinar_control_sigval1.html')
-chart.save(save_path+'density_plot_islet_vs_acinar_control_sigval_any.html')
+#chart1.save(save_path+'density_plot_islet_vs_acinar_control_sigval1.html')
+chart1.save(save_path+'density_plot_islet_vs_acinar_control_sigval_any.html')
+
+
+chart2 = alt.Chart(df).mark_boxplot(extent="min-max", opacity=0.7).encode(
+    alt.X("ct:Q", stack='zero' ).scale(zero=False)
+)
+chart2.save(save_path+'box_plot_minmax_islet_vs_acinar_control_sigval_any.html')
+
+chart = alt.layer(chart1, chart2)
+chart.save(save_path+'box_and_density_islet_vs_acinar_control_sigval_any.html')
+
+
 
 median_value = np.round(np.median(ROI_control_ct_distribution['ct']),1)
 file_to_plot = ''
@@ -281,11 +291,9 @@ for i in range (1, len(out_histocat)):
             if out_histocat[i][9] !='NA': # == '1':
                 ROI_control_ct_distribution['Distribution_type'].append('Control')
                 ROI_control_ct_distribution['ct'].append(float(out_histocat[i][3]))
-            else: #out_histocat[i][9] == 'NA':
+            else: 
                 continue
-            #else:
-            #    ROI_control_ct_distribution['Distribution_type'].append('Control')
-            #    ROI_control_ct_distribution['ct'].append(0)
+
 
 
 ### in AAB+ ##
@@ -336,18 +344,28 @@ for i in range (1, len(out_histocat)):
 ####### make combined density plot ###########
 
 df = pd.DataFrame(ROI_control_ct_distribution)
-chart =alt.Chart(df).transform_density(
+chart1 =alt.Chart(df).transform_density(
     'ct',
     as_=['ct', 'density'],
-    groupby=['Distribution_type'],
-    #bandwidth=0.3,
-    #counts = True,
-    #steps=100
-    
+    groupby=['Distribution_type'],    
 ).mark_area(opacity=0.5).encode(
     alt.X('ct:Q'),
     alt.Y('density:Q' ), #, stack='zero'
     alt.Color('Distribution_type:N')
 )
-chart.save(save_path+'density_plot_islet_vs_CD8poz_control_AAB_T1DM_short_long_sigval_any.html')
-#chart.save(save_path+'density_plot_islet_vs_CD8poz_control_AAB_T1DM_short_long_sigval1.html')
+chart1.save(save_path+'density_plot_islet_vs_CD8poz_control_AAB_T1DM_short_long_sigval_any.html')
+#chart1.save(save_path+'density_plot_islet_vs_CD8poz_control_AAB_T1DM_short_long_sigval1.html')
+
+chart2 = alt.Chart(df).mark_boxplot(extent="min-max", opacity=0.5).encode(
+    alt.X("ct:Q").scale(zero=False), 
+#    alt.Y('Distribution_type:N'),
+#    alt.Color('Distribution_type:N')
+)
+chart2.save(save_path+'box_plot_islet_vs_CD8poz_control_AAB_T1DM_short_long_sigval_any.html')
+
+chart = alt.layer(chart1, chart2)
+chart.save(save_path+'box_and_density_islet_vs_CD8poz_control_AAB_T1DM_short_long_sigval_any.html')
+
+
+
+
