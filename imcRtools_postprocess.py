@@ -96,16 +96,16 @@ for i in range (1, len(out_histocat)):
     if out_histocat[i][0] in ROI_control:
         if  out_histocat[i][1]== 'Islet_Cells' and out_histocat[i][2]== 'Islet_Cells':
             
-            if out_histocat[i][9] == '1':
+            if out_histocat[i][9] != 'NA': #= '1':
                 ROI_control_ct_distribution['Distribution_type'].append('Islet vs Islet cells in Control')
                 ROI_control_ct_distribution['ct'].append(float(out_histocat[i][3]))
-            elif out_histocat[i][9] == 'NA':
+                file_name_list.append(out_histocat[i][0])
+                ROI_control_Islet_Islet_ct[out_histocat[i][0]] = [out_histocat[i][3], out_histocat[i][9]]
+                print('%s, %g'%(out_histocat[i][0], float(out_histocat[i][3])))
+            
+            else: #0, -1, NA
                 continue
-            else:
-                ROI_control_ct_distribution['Distribution_type'].append('Islet vs Islet cells in Control')
-                ROI_control_ct_distribution['ct'].append(0)
-            file_name_list.append(out_histocat[i][0])
-            ROI_control_Islet_Islet_ct[out_histocat[i][0]] = [out_histocat[i][3], out_histocat[i][9]]
+
 #################### draw density plot of ct values for islet vs islet cells in control ###############
 
 df = pd.DataFrame(ROI_control_ct_distribution)
@@ -124,13 +124,14 @@ chart =alt.Chart(df).transform_density(
 )
 
 
-chart.save(save_path+'density_plot_islet_vs_islet_control.html')
+#chart.save(save_path+'density_plot_islet_vs_islet_control_sigval1.html')
+chart.save(save_path+'density_plot_islet_vs_islet_control_sigval_any.html')
 
 
-median_value = np.median(ROI_control_ct_distribution['ct'])
+median_value = np.round(np.median(ROI_control_ct_distribution['ct']),2)
 file_to_plot = ''
 for i in range (0, len(file_name_list)):
-    if ROI_control_ct_distribution['ct'][i]==median_value:
+    if np.round(ROI_control_ct_distribution['ct'][i],2)==median_value:
         print(file_name_list[i])
         file_to_plot = file_name_list[i]
         
@@ -139,7 +140,7 @@ for i in range (0, len(file_name_list)):
 cell_meta_data = []
 annospat_label = ['Acinar_Cells',  'Alpha_Cells', 'Beta_Cells', 'Delta_Cells',  'Gamma_Cells', 'Killer_T_Cells' ]
 for cell_serial in range (0, len(file_name)):
-    if file_name[cell_serial] == file_to_plot: # and cell_label_all[cell_serial] in annospat_label:
+    if file_name[cell_serial] == file_to_plot and cell_label_all[cell_serial] in annospat_label:
         cell_meta_data.append([float(x_coord[cell_serial]), float(y_coord[cell_serial]), cell_label_all[cell_serial] ])
 
 data_list=dict()
@@ -159,7 +160,9 @@ chart = alt.Chart(data_list_pd).mark_point(filled=True, opacity = 1).encode(
     tooltip=['label'] #,'opacity'
 )#.configure_legend(labelFontSize=6, symbolLimit=50)
 
-chart.save(save_path+'altair_plot_islet_islet_control_median.html')
+#chart.save(save_path+'altair_plot_islet_islet_control_sigval1_median.html')
+chart.save(save_path+'altair_plot_islet_islet_control_sigval_any_median.html')
+
 ###############################################################################################################
 '''
 
@@ -187,16 +190,15 @@ for i in range (1, len(out_histocat)):
     if out_histocat[i][0] in ROI_control:
         if  (out_histocat[i][1]== 'Islet_Cells' and out_histocat[i][2]== 'Acinar_Cells') or (out_histocat[i][1]=='Acinar_Cells' and out_histocat[i][2]=='Islet_Cells'):
             
-            if out_histocat[i][9] == '1':
+            if out_histocat[i][9] != 'NA': # == '1':
                 ROI_control_ct_distribution['Distribution_type'].append('Islet vs Acinar cells in Control')
                 ROI_control_ct_distribution['ct'].append(float(out_histocat[i][3]))
-            elif out_histocat[i][9] == 'NA': # or out_histocat[i][9] == '-1':
+                file_name_list.append(out_histocat[i][0])
+                ROI_control_Islet_Acinar_ct[out_histocat[i][0]] = [out_histocat[i][3], out_histocat[i][9]]
+                print('%s, %g'%(out_histocat[i][0], float(out_histocat[i][3])))
+            else: #0, -1, NA
                 continue
-            else:
-                ROI_control_ct_distribution['Distribution_type'].append('Islet vs Acinar cells in Control')
-                ROI_control_ct_distribution['ct'].append(0)
-            file_name_list.append(out_histocat[i][0])
-            ROI_control_Islet_Acinar_ct[out_histocat[i][0]] = [out_histocat[i][3], out_histocat[i][9]]
+
 #################### draw density plot of ct values for islet vs islet cells in control ###############
 
 
@@ -215,13 +217,43 @@ chart =alt.Chart(df).transform_density(
     alt.Color('Distribution_type:N')
 )
 
-chart.save(save_path+'density_plot_islet_vs_acinar_control.html')
-median_value = np.median(ROI_control_ct_distribution['ct'])
+#chart.save(save_path+'density_plot_islet_vs_acinar_control_sigval1.html')
+chart.save(save_path+'density_plot_islet_vs_acinar_control_sigval_any.html')
 
+median_value = np.round(np.median(ROI_control_ct_distribution['ct']),1)
+file_to_plot = ''
 for i in range (0, len(file_name_list)):
-    if ROI_control_ct_distribution['ct'][i]==median_value:
+    if np.round(ROI_control_ct_distribution['ct'][i],1)==median_value:
         print(file_name_list[i])
+        file_to_plot = file_name_list[i]
+        
 
+##### draw the scatter plot ################
+cell_meta_data = []
+annospat_label = ['Acinar_Cells',  'Alpha_Cells', 'Beta_Cells', 'Delta_Cells',  'Gamma_Cells', 'Killer_T_Cells' ]
+for cell_serial in range (0, len(file_name)):
+    if file_name[cell_serial] == file_to_plot and cell_label_all[cell_serial] in annospat_label:
+        cell_meta_data.append([float(x_coord[cell_serial]), float(y_coord[cell_serial]), cell_label_all[cell_serial] ])
+
+data_list=dict()
+data_list['X']=[]
+data_list['Y']=[]   
+data_list['label']=[] 
+for i in range (0, len(cell_meta_data)):
+    data_list['X'].append(cell_meta_data[i][0])
+    data_list['Y'].append(cell_meta_data[i][1])
+    data_list['label'].append(cell_meta_data[i][2])
+
+data_list_pd = pd.DataFrame(data_list)
+chart = alt.Chart(data_list_pd).mark_point(filled=True, opacity = 1).encode(
+    alt.X('X', scale=alt.Scale(zero=False)),
+    alt.Y('Y', scale=alt.Scale(zero=False)),
+    color=alt.Color('label:N'), #, scale=alt.Scale(range=set1)
+    tooltip=['label'] #,'opacity'
+)#.configure_legend(labelFontSize=6, symbolLimit=50)
+
+#chart.save(save_path+'altair_plot_islet_acinar_control_sigval1_median.html')
+chart.save(save_path+'altair_plot_islet_acinar_control_sigval_any_median.html')
 
 ################################# Islet vs CD8+ cells in 4 states ###############################################################################
 ROI_control_ct_distribution = defaultdict(list)
@@ -232,14 +264,14 @@ for i in range (1, len(out_histocat)):
     if out_histocat[i][0] in ROI_control:
         if  (out_histocat[i][1]== 'Islet_Cells' and out_histocat[i][2]== 'Killer_T_Cells') or (out_histocat[i][1]== 'Killer_T_Cells' and out_histocat[i][2]== 'Islet_Cells' ) :
             ROI_control_Islet_CD8_ct[out_histocat[i][0]] = [out_histocat[i][3], out_histocat[i][9]]
-            if out_histocat[i][9] == '1':
+            if out_histocat[i][9] !='NA': # == '1':
                 ROI_control_ct_distribution['Distribution_type'].append('Control')
                 ROI_control_ct_distribution['ct'].append(float(out_histocat[i][3]))
-            elif out_histocat[i][9] == 'NA':
+            else: #out_histocat[i][9] == 'NA':
                 continue
-            else:
-                ROI_control_ct_distribution['Distribution_type'].append('Control')
-                ROI_control_ct_distribution['ct'].append(0)
+            #else:
+            #    ROI_control_ct_distribution['Distribution_type'].append('Control')
+            #    ROI_control_ct_distribution['ct'].append(0)
 
 
 ### in AAB+ ##
@@ -248,14 +280,14 @@ for i in range (1, len(out_histocat)):
     if out_histocat[i][0] in ROI_AAB_poz:
         if  (out_histocat[i][1]== 'Islet_Cells' and out_histocat[i][2]== 'Killer_T_Cells') or (out_histocat[i][1]== 'Killer_T_Cells' and out_histocat[i][2]== 'Islet_Cells' ) :
             ROI_AAB_poz_Islet_CD8_ct[out_histocat[i][0]] = [out_histocat[i][3], out_histocat[i][9]]
-            if out_histocat[i][9] == '1':
+            if out_histocat[i][9] !='NA': #  == '1':
                 ROI_control_ct_distribution['Distribution_type'].append('AAB+')
                 ROI_control_ct_distribution['ct'].append(float(out_histocat[i][3]))
-            elif out_histocat[i][9] == 'NA':
+            else: 
                 continue
-            else:
-                ROI_control_ct_distribution['Distribution_type'].append('AAB+')
-                ROI_control_ct_distribution['ct'].append(0)
+#            else:
+#                ROI_control_ct_distribution['Distribution_type'].append('AAB+')
+#                ROI_control_ct_distribution['ct'].append(0)
 
 ### in Short T1DM ##
 ROI_short_T1DM_Islet_CD8_ct = dict() # column 3
@@ -263,14 +295,14 @@ for i in range (1, len(out_histocat)):
     if out_histocat[i][0] in ROI_short_T1DM:
         if  (out_histocat[i][1]== 'Islet_Cells' and out_histocat[i][2]== 'Killer_T_Cells') or (out_histocat[i][1]== 'Killer_T_Cells' and out_histocat[i][2]== 'Islet_Cells' ) :
             ROI_short_T1DM_Islet_CD8_ct[out_histocat[i][0]] = [out_histocat[i][3], out_histocat[i][9]]
-            if out_histocat[i][9] == '1':
+            if out_histocat[i][9] !='NA': #  == '1':
                 ROI_control_ct_distribution['Distribution_type'].append('T1DM<1')
                 ROI_control_ct_distribution['ct'].append(float(out_histocat[i][3]))
-            elif out_histocat[i][9] == 'NA':
+            else: #out_histocat[i][9] == 'NA':
                 continue
-            else:
-                ROI_control_ct_distribution['Distribution_type'].append('T1DM<1')
-                ROI_control_ct_distribution['ct'].append(0)
+#            else:
+#                ROI_control_ct_distribution['Distribution_type'].append('T1DM<1')
+#                ROI_control_ct_distribution['ct'].append(0)
 
 ### in Long T1DM ##
 ROI_long_T1DM_Islet_CD8_ct = dict() # column 3
@@ -278,14 +310,14 @@ for i in range (1, len(out_histocat)):
     if out_histocat[i][0] in ROI_long_T1DM:
         if  (out_histocat[i][1]== 'Islet_Cells' and out_histocat[i][2]== 'Killer_T_Cells') or (out_histocat[i][1]== 'Killer_T_Cells' and out_histocat[i][2]== 'Islet_Cells' ) :
             ROI_long_T1DM_Islet_CD8_ct[out_histocat[i][0]] = [out_histocat[i][3], out_histocat[i][9]]
-            if out_histocat[i][9] == '1':
+            if out_histocat[i][9] !='NA': #  == '1':
                 ROI_control_ct_distribution['Distribution_type'].append('T1DM>=1')
                 ROI_control_ct_distribution['ct'].append(float(out_histocat[i][3]))
-            elif out_histocat[i][9] == 'NA':
+            else: # out_histocat[i][9] == 'NA':
                 continue
-            else:
-                ROI_control_ct_distribution['Distribution_type'].append('T1DM>=1')
-                ROI_control_ct_distribution['ct'].append(0)
+#            else:
+#                ROI_control_ct_distribution['Distribution_type'].append('T1DM>=1')
+#                ROI_control_ct_distribution['ct'].append(0)
 
 ####### make combined density plot ###########
 
@@ -303,5 +335,5 @@ chart =alt.Chart(df).transform_density(
     alt.Y('density:Q' ), #, stack='zero'
     alt.Color('Distribution_type:N')
 )
-
-chart.save(save_path+'density_plot_islet_vs_CD8poz_control_AAB_T1DM_short_long.html')
+chart.save(save_path+'density_plot_islet_vs_CD8poz_control_AAB_T1DM_short_long_sigval_any.html')
+#chart.save(save_path+'density_plot_islet_vs_CD8poz_control_AAB_T1DM_short_long_sigval1.html')
