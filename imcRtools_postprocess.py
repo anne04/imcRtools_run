@@ -86,7 +86,7 @@ with open('/mnt/data1/fatema/out.csv') as file:
     for line in csv_file:
         out_histocat.append(line)
 
-############### Islet vs Islet: find the 'ct' (and 'P'?) values for each of these ROI_control ########
+############### Islet vs Islet: find the 'ct' (and sigval?) values for each of these ROI_control ########
 from collections import defaultdict
 
 ROI_control_Islet_Islet_ct = dict() # column 3
@@ -109,7 +109,7 @@ for i in range (1, len(out_histocat)):
 #################### draw density plot of ct values for islet vs islet cells in control ###############
 
 df = pd.DataFrame(ROI_control_ct_distribution)
-chart =alt.Chart(df).transform_density(
+chart = alt.Chart(df).transform_density(
     'ct',
     as_=['ct', 'density'],
     groupby=['Distribution_type'],
@@ -126,6 +126,20 @@ chart =alt.Chart(df).transform_density(
 
 #chart.save(save_path+'density_plot_islet_vs_islet_control_sigval1.html')
 chart.save(save_path+'density_plot_islet_vs_islet_control_sigval_any.html')
+
+
+import altair as alt
+from vega_datasets import data
+
+source = data.cars()
+
+chart = alt.Chart(df).mark_boxplot(extent="min-max").encode(
+    alt.X("ct:Q").scale(zero=False)
+    #alt.Y("Origin:N"),
+)
+chart.save(save_path+'box_plot_minmax_islet_vs_islet_control_sigval_any.html')
+
+
 
 
 median_value = np.round(np.median(ROI_control_ct_distribution['ct']),2)
@@ -182,7 +196,7 @@ chart.save(save_path+'region_of_interest_filtered_combined_attention_distributio
 '''
 
 
-############### Islet vs Acinar: find the 'ct' (and 'P'?) values for each of these ROI_control ########
+############### Islet vs Acinar: find the 'ct' (and 'sigval'?) values for each of these ROI_control ########
 ROI_control_Islet_Acinar_ct = dict() # column 3
 ROI_control_ct_distribution = defaultdict(list)
 file_name_list = []
