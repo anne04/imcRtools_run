@@ -5,6 +5,13 @@ import csv
 import numpy as np
 import sys
 import altair as alt
+import altairThemes 
+from collections import defaultdict
+
+# register the custom theme under a chosen name
+alt.themes.register("publishTheme", altairThemes.publishTheme)
+# enable the newly registered theme
+alt.themes.enable("publishTheme")
 
 save_path = '/mnt/data1/fatema/'
 ###################### read cell labels, status, ROI filenames #######################################################
@@ -87,7 +94,6 @@ with open('/mnt/data1/fatema/out.csv') as file:
         out_histocat.append(line)
 
 ############### Islet vs Islet: find the 'ct' (and sigval?) values for each of these ROI_control ########
-from collections import defaultdict
 
 ROI_control_Islet_Islet_ct = dict() # column 3
 box_plot_ct = defaultdict(list)
@@ -123,7 +129,8 @@ chart1 = alt.Chart(df).transform_density(
 ).mark_area(opacity=0.7).encode(
     alt.X('ct:Q'),
     alt.Y('density:Q', stack='zero' ),
-    alt.Color('Distribution_type:N')
+    alt.Color('Distribution_type:N'),
+    tooltip=['ct']
 )
 
 
@@ -132,8 +139,7 @@ chart1.save(save_path+'density_plot_islet_vs_islet_control_sigval_any.html')
 
 df = pd.DataFrame(box_plot_ct)
 chart2 = alt.Chart(df).mark_boxplot(extent="min-max", opacity=0.7).encode(
-    alt.X("ct:Q", stack='zero' ).scale(zero=False), 
-    #alt.Y("y:N", stack='zero' ),
+    alt.X("ct:Q", stack='zero' ).scale(zero=False)
 )
 chart2.save(save_path+'box_plot_minmax_islet_vs_islet_control_sigval_any.html')
 
@@ -166,11 +172,13 @@ for i in range (0, len(cell_meta_data)):
     data_list['Y'].append(cell_meta_data[i][1])
     data_list['label'].append(cell_meta_data[i][2])
 
+set1 = altairThemes.get_colour_scheme("Set1", len(list(set(data_list['label']))))
+#color=alt.Color('component_label:N', scale=alt.Scale(range=set1))
 data_list_pd = pd.DataFrame(data_list)
 chart = alt.Chart(data_list_pd).mark_point(filled=True, opacity = 1).encode(
     alt.X('X', scale=alt.Scale(zero=False)),
     alt.Y('Y', scale=alt.Scale(zero=False)),
-    color=alt.Color('label:N'), #, scale=alt.Scale(range=set1)
+    color=alt.Color('label:N', scale=alt.Scale(range=set1)), #
     tooltip=['label'] #,'opacity'
 )#.configure_legend(labelFontSize=6, symbolLimit=50)
 
@@ -219,15 +227,13 @@ df = pd.DataFrame(ROI_control_ct_distribution)
 chart1 =alt.Chart(df).transform_density(
     'ct',
     as_=['ct', 'density'],
-    groupby=['Distribution_type'],
-    #bandwidth=0.3,
-    #counts = True,
-    #steps=100
+    groupby=['Distribution_type']
     
 ).mark_area(opacity=0.7).encode(
     alt.X('ct:Q'),
     alt.Y('density:Q', stack='zero' ),
-    alt.Color('Distribution_type:N')
+    alt.Color('Distribution_type:N'),
+    tooltip=['ct']
 )
 
 #chart1.save(save_path+'density_plot_islet_vs_acinar_control_sigval1.html')
@@ -235,7 +241,7 @@ chart1.save(save_path+'density_plot_islet_vs_acinar_control_sigval_any.html')
 
 
 chart2 = alt.Chart(df).mark_boxplot(extent="min-max", opacity=0.7).encode(
-    alt.X("ct:Q", stack='zero' ).scale(zero=False)
+    alt.X("ct:Q", stack='zero').scale(zero=False)
 )
 chart2.save(save_path+'box_plot_minmax_islet_vs_acinar_control_sigval_any.html')
 
@@ -268,11 +274,12 @@ for i in range (0, len(cell_meta_data)):
     data_list['Y'].append(cell_meta_data[i][1])
     data_list['label'].append(cell_meta_data[i][2])
 
+set1 = altairThemes.get_colour_scheme("Set1", len(list(set(data_list['label']))))
 data_list_pd = pd.DataFrame(data_list)
 chart = alt.Chart(data_list_pd).mark_point(filled=True, opacity = 1).encode(
     alt.X('X', scale=alt.Scale(zero=False)),
     alt.Y('Y', scale=alt.Scale(zero=False)),
-    color=alt.Color('label:N'), #, scale=alt.Scale(range=set1)
+    color=alt.Color('label:N', scale=alt.Scale(range=set1)),
     tooltip=['label'] #,'opacity'
 )#.configure_legend(labelFontSize=6, symbolLimit=50)
 
@@ -280,17 +287,19 @@ chart = alt.Chart(data_list_pd).mark_point(filled=True, opacity = 1).encode(
 chart.save(save_path+'altair_plot_islet_acinar_control_sigval_any_median.html')
 
 ################################# Islet vs CD8+ cells in 4 states ###############################################################################
-ROI_control_ct_distribution = defaultdict(list)
+ROI_ct_distribution = defaultdict(list)
 
 ### in control ##
+ROI_control_ct_distribution = []
 ROI_control_Islet_CD8_ct = dict() # column 3
 for i in range (1, len(out_histocat)):
     if out_histocat[i][0] in ROI_control:
         if  (out_histocat[i][1]== 'Islet_Cells' and out_histocat[i][2]== 'Killer_T_Cells') or (out_histocat[i][1]== 'Killer_T_Cells' and out_histocat[i][2]== 'Islet_Cells' ) :
             ROI_control_Islet_CD8_ct[out_histocat[i][0]] = [out_histocat[i][3], out_histocat[i][9]]
             if out_histocat[i][9] !='NA': # == '1':
-                ROI_control_ct_distribution['Distribution_type'].append('Control')
-                ROI_control_ct_distribution['ct'].append(float(out_histocat[i][3]))
+                ROI_ct_distribution['Distribution_type'].append('Control')
+                ROI_ct_distribution['ct'].append(float(out_histocat[i][3]))
+                ROI_control_ct_distribution.append(float(out_histocat[i][3]))
             else: 
                 continue
 
@@ -298,74 +307,116 @@ for i in range (1, len(out_histocat)):
 
 ### in AAB+ ##
 ROI_AAB_poz_Islet_CD8_ct = dict() # column 3
+ROI_AAB_poz_ct_distribution = []
 for i in range (1, len(out_histocat)):
     if out_histocat[i][0] in ROI_AAB_poz:
         if  (out_histocat[i][1]== 'Islet_Cells' and out_histocat[i][2]== 'Killer_T_Cells') or (out_histocat[i][1]== 'Killer_T_Cells' and out_histocat[i][2]== 'Islet_Cells' ) :
             ROI_AAB_poz_Islet_CD8_ct[out_histocat[i][0]] = [out_histocat[i][3], out_histocat[i][9]]
             if out_histocat[i][9] !='NA': #  == '1':
-                ROI_control_ct_distribution['Distribution_type'].append('AAB+')
-                ROI_control_ct_distribution['ct'].append(float(out_histocat[i][3]))
+                ROI_ct_distribution['Distribution_type'].append('AAB+')
+                ROI_ct_distribution['ct'].append(float(out_histocat[i][3]))
+                ROI_AAB_poz_ct_distribution.append(float(out_histocat[i][3]))
             else: 
                 continue
-#            else:
-#                ROI_control_ct_distribution['Distribution_type'].append('AAB+')
-#                ROI_control_ct_distribution['ct'].append(0)
 
 ### in Short T1DM ##
 ROI_short_T1DM_Islet_CD8_ct = dict() # column 3
+ROI_short_T1DM_ct_distribution = []
 for i in range (1, len(out_histocat)):
     if out_histocat[i][0] in ROI_short_T1DM:
         if  (out_histocat[i][1]== 'Islet_Cells' and out_histocat[i][2]== 'Killer_T_Cells') or (out_histocat[i][1]== 'Killer_T_Cells' and out_histocat[i][2]== 'Islet_Cells' ) :
             ROI_short_T1DM_Islet_CD8_ct[out_histocat[i][0]] = [out_histocat[i][3], out_histocat[i][9]]
             if out_histocat[i][9] !='NA': #  == '1':
-                ROI_control_ct_distribution['Distribution_type'].append('T1DM<1')
-                ROI_control_ct_distribution['ct'].append(float(out_histocat[i][3]))
+                ROI_ct_distribution['Distribution_type'].append('T1DM<1')
+                ROI_ct_distribution['ct'].append(float(out_histocat[i][3]))
+                ROI_short_T1DM_ct_distribution.append(float(out_histocat[i][3]))
             else: #out_histocat[i][9] == 'NA':
                 continue
-#            else:
-#                ROI_control_ct_distribution['Distribution_type'].append('T1DM<1')
-#                ROI_control_ct_distribution['ct'].append(0)
 
 ### in Long T1DM ##
 ROI_long_T1DM_Islet_CD8_ct = dict() # column 3
+ROI_long_T1DM_ct_distribution = []
 for i in range (1, len(out_histocat)):
     if out_histocat[i][0] in ROI_long_T1DM:
         if  (out_histocat[i][1]== 'Islet_Cells' and out_histocat[i][2]== 'Killer_T_Cells') or (out_histocat[i][1]== 'Killer_T_Cells' and out_histocat[i][2]== 'Islet_Cells' ) :
             ROI_long_T1DM_Islet_CD8_ct[out_histocat[i][0]] = [out_histocat[i][3], out_histocat[i][9]]
             if out_histocat[i][9] !='NA': #  == '1':
-                ROI_control_ct_distribution['Distribution_type'].append('T1DM>=1')
-                ROI_control_ct_distribution['ct'].append(float(out_histocat[i][3]))
+                ROI_ct_distribution['Distribution_type'].append('T1DM>=1')
+                ROI_ct_distribution['ct'].append(float(out_histocat[i][3]))
+                ROI_long_T1DM_ct_distribution.append(float(out_histocat[i][3]))
             else: # out_histocat[i][9] == 'NA':
                 continue
-#            else:
-#                ROI_control_ct_distribution['Distribution_type'].append('T1DM>=1')
-#                ROI_control_ct_distribution['ct'].append(0)
 
 ####### make combined density plot ###########
-
-df = pd.DataFrame(ROI_control_ct_distribution)
+set1 = altairThemes.get_colour_scheme("Set1", len(list(set(ROI_ct_distribution['Distribution_type']))))
+df = pd.DataFrame(ROI_ct_distribution)
 chart1 =alt.Chart(df).transform_density(
     'ct',
     as_=['ct', 'density'],
     groupby=['Distribution_type'],    
-).mark_area(opacity=0.5).encode(
+).mark_area(opacity=0.7).encode(
     alt.X('ct:Q'),
     alt.Y('density:Q' ), #, stack='zero'
-    alt.Color('Distribution_type:N')
+    alt.Color('Distribution_type:N', scale=alt.Scale(range=set1))
 )
 chart1.save(save_path+'density_plot_islet_vs_CD8poz_control_AAB_T1DM_short_long_sigval_any.html')
 #chart1.save(save_path+'density_plot_islet_vs_CD8poz_control_AAB_T1DM_short_long_sigval1.html')
 
-chart2 = alt.Chart(df).mark_boxplot(extent="min-max", opacity=0.5).encode(
+chart2 = alt.Chart(df).mark_boxplot(extent="min-max", opacity=0.7).encode(
     alt.X("ct:Q").scale(zero=False), 
-#    alt.Y('Distribution_type:N'),
-#    alt.Color('Distribution_type:N')
+    alt.Y('Distribution_type:N'),
+    alt.Color('Distribution_type:N')
 )
 chart2.save(save_path+'box_plot_islet_vs_CD8poz_control_AAB_T1DM_short_long_sigval_any.html')
 
-chart = alt.layer(chart1, chart2)
+chart = alt.hconcat(chart1, chart2)
 chart.save(save_path+'box_and_density_islet_vs_CD8poz_control_AAB_T1DM_short_long_sigval_any.html')
 
+################### from scipy.stats import mannwhitneyu
+# ROI_control_ct_distribution
+# ROI_AAB_poz_ct_distribution
+# ROI_short_T1DM_ct_distribution
+# ROI_long_T1DM_ct_distribution
 
+from scipy.stats import mannwhitneyu
 
+dummy, p = mannwhitneyu(ROI_control_ct_distribution, ROI_AAB_poz_ct_distribution, method="exact")
+print('mannwhitneyu p: control - AAB_poz = %g'%p)
 
+dummy, p = mannwhitneyu(ROI_control_ct_distribution, ROI_short_T1DM_ct_distribution, method="exact")
+print('mannwhitneyu p: control - short_T1DM = %g'%p)
+
+dummy, p = mannwhitneyu(ROI_control_ct_distribution, ROI_long_T1DM_ct_distribution, method="exact")
+print('mannwhitneyu p: control - long_T1DM = %g'%p)
+
+dummy, p = mannwhitneyu(ROI_AAB_poz_ct_distribution, ROI_short_T1DM_ct_distribution, method="exact")
+print('mannwhitneyu p: AAB_poz - short_T1DM =  %g'%p)
+
+dummy, p = mannwhitneyu(ROI_AAB_poz_ct_distribution, ROI_long_T1DM_ct_distribution, method="exact")
+print('mannwhitneyu p: AAB_poz - long_T1DM = %g'%p)
+
+dummy, p = mannwhitneyu(ROI_short_T1DM_ct_distribution, ROI_long_T1DM_ct_distribution, method="exact")
+print('mannwhitneyu p: short_T1DM - long_T1DM = %g'%p)
+
+###############################################
+from scipy.stats.mstats import kruskal
+
+dummy, p = kruskal(ROI_control_ct_distribution, ROI_AAB_poz_ct_distribution)
+print('kruskal p: control - AAB_poz = %g'%p)
+
+dummy, p = kruskal(ROI_control_ct_distribution, ROI_short_T1DM_ct_distribution)
+print('kruskal p: control - short_T1DM = %g'%p)
+
+dummy, p = kruskal(ROI_control_ct_distribution, ROI_long_T1DM_ct_distribution)
+print('kruskal p: control - long_T1DM = %g'%p)
+
+dummy, p = kruskal(ROI_AAB_poz_ct_distribution, ROI_short_T1DM_ct_distribution)
+print('kruskal p: AAB_poz - short_T1DM =  %g'%p)
+
+dummy, p = kruskal(ROI_AAB_poz_ct_distribution, ROI_long_T1DM_ct_distribution)
+print('kruskal p: AAB_poz - long_T1DM = %g'%p)
+
+dummy, p = kruskal(ROI_short_T1DM_ct_distribution, ROI_long_T1DM_ct_distribution)
+print('kruskal p: short_T1DM - long_T1DM = %g'%p)
+
+kruskal(ROI_AAB_poz_ct_distribution, ROI_control_ct_distribution, ROI_short_T1DM_ct_distribution, ROI_long_T1DM_ct_distribution)
