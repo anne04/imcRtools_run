@@ -20,19 +20,12 @@ for(i in 1:ncol(df)) {
 }
 
 countsData <- read.csv(file = paste('/cluster/home/t116508uhn/synthetic_gene_vs_cell_',options,'.csv', sep=""),row.names = 1) # read.csv(file = '/cluster/home/t116508uhn/synthetic_gene_vs_cell_type6_f.csv',row.names = 1)
-temp <- CreateSeuratObject(counts = countsData)
-
-temp@meta.data$x <- cell_x[[1]]
-temp@meta.data$y <- cell_y[[1]]
-DefaultAssay(temp) <- "Spatial"
-
-#temp@meta.data$x <- temp@images$slice1@coordinates$row
-#temp@meta.data$y <- temp@images$slice1@coordinates$col
+pdac_sample <- CreateSeuratObject(counts = countsData)
 
 
 temp <- SCTransform(pdac_sample)
-temp <- ScaleData(pdac_sample)
-temp <- FindVariableFeatures(temp) 
+#temp <- ScaleData(pdac_sample)
+#temp <- FindVariableFeatures(temp) 
 temp <- RunPCA(temp, verbose = FALSE)
 temp <- FindNeighbors(temp, reduction = "pca", dims = 1:30)
 temp <- FindClusters(temp, verbose = FALSE)
