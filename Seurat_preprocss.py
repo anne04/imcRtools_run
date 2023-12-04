@@ -5,11 +5,17 @@ import csv
 import numpy as np
 import sys
 from collections import defaultdict
-data1_path = '/mnt/data1/fatema/IMC_T1D_data1/'
 
+data1_path_to = '/mnt/data1/fatema/IMC_T1D_data1/'
+data2_path_to = '/mnt/data1/fatema/IMC_mgdf_gad+_gad-sample/'
 
+data1_path_from = '/mnt/data1/fatema/IMC_T1D/raw_data/mgDF.csv'
+data2_path_from = '/mnt/data1/fatema/IMC_T1D/raw_data/mgDF_GAD+GAD-samples.csv'
 
-df = pd.read_csv('/mnt/data1/fatema/IMC_T1D/raw_data/mgDF.csv', sep=",", header=0,index_col=0) 
+type = ['mgDF', 'mgDF_GAD+GAD-', 'T1D']
+type_id = 1
+
+df = pd.read_csv(data2_path_from, sep=",", header=0,index_col=0) 
 # seperate the protein names, (x, y), and cell names
 
 cell_name = []
@@ -56,6 +62,7 @@ data_list=defaultdict(list)
 gene_vs_cell = np.zeros((len(protein_name),len(cell_name)))
 for i in range (0, len(protein_name)):
     gene = protein_name[i]
+    print(gene)
     for j in range (0, len(cell_name)):
         cell = cell_name[j]
         gene_vs_cell[i][j] = df[gene][cell]
@@ -65,27 +72,28 @@ for i in range (0, len(protein_name)):
 data_list_pd = pd.DataFrame(data_list)        
 data_list_pd[' '] = protein_name
 data_list_pd = data_list_pd.set_index(' ')    
-data_list_pd.to_csv(data1_path+'gene_vs_cell_mgDF.csv')
-np.save(data1_path+"gene_vs_cell_count_mgDF", gene_vs_cell)
+data_list_pd.to_csv(data2_path_to+'gene_vs_cell_'+type[type_id]+'.csv')
+np.save(data2_path_to+"gene_vs_cell_count_'+type[type_id]+'", gene_vs_cell)
 
 df = pd.DataFrame(protein_name)
-df.to_csv(data1_path+'protein_marker_mgDF.csv', index=False, header=False)
+df.to_csv(data2_path_to+'protein_marker_'+type[type_id]+'.csv', index=False, header=False)
 
 df = pd.DataFrame(cell_name)
-df.to_csv(data1_path+'cell_id_mgDF.csv', index=False, header=False)
+df.to_csv(data2_path_to+'cell_id_'+type[type_id]+'.csv', index=False, header=False)
 
 df = pd.DataFrame(file_name)
-df.to_csv(data1_path+'file_name_mgDF.csv', index=False, header=False)
+df.to_csv(data2_path_to+'file_name_'+type[type_id]+'.csv', index=False, header=False)
 
 df = pd.DataFrame(status_list)
-df.to_csv(data1_path+'status_list_mgDF.csv', index=False, header=False)
+df.to_csv(data2_path_to+'status_list_'+type[type_id]+'.csv', index=False, header=False)
 
 df = pd.DataFrame(x_coord)
-df.to_csv(data1_path+'x_coord_mgDF.csv', index=False, header=False)
+df.to_csv(data2_path_to+'x_coord_'+type[type_id]+'.csv', index=False, header=False)
 
 df = pd.DataFrame(y_coord)
-df.to_csv(data1_path+'y_coord_mgDF.csv', index=False, header=False)
+df.to_csv(data2_path_to+'y_coord_'+type[type_id]+'.csv', index=False, header=False)
 
+print('all done')
 #df = pd.DataFrame(cell_label)
-#df.to_csv(data1_path+'cell_label_islets_mgDF.csv', index=False, header=False)
+#df.to_csv(data2_path_to+'cell_label_islets_'+type[type_id]+'.csv', index=False, header=False)
 
