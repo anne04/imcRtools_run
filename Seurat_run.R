@@ -34,6 +34,14 @@ temp <- FindClusters(temp, resolution=0.3)
 save(temp, file='/mnt/data1/fatema/IMC_T1D_data1/temp.Rda')
 temp_matrix <- temp[['seurat_clusters']]
 write.csv(temp_matrix, '/mnt/data1/fatema/IMC_T1D_data1/seurat_clusters.csv')
+temp_protein_cell <- GetAssayData(object = temp, layer = "scale.data")
+temp_protein_cell <- as.matrix(temp_protein_cell)
+write.csv(temp_protein_cell, paste('/mnt/data1/fatema/IMC_T1D_data1/scaled_protein.csv',sep=""))
+
+temp_protein_cell <- GetAssayData(object = temp, layer = "data")
+temp_protein_cell <- as.matrix(temp_protein_cell)
+write.csv(temp_protein_cell, paste('/mnt/data1/fatema/IMC_T1D_data1/normalized_protein.csv',sep=""))
+
 #################################################################################
 
 ####################################################################################
