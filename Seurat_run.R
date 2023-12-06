@@ -18,8 +18,8 @@ gene_ids <- read.csv('/mnt/data1/fatema/IMC_T1D_data1/protein_marker_mgDF.csv', 
 gene_vector <- gene_ids[, 1]
 colnames(mat) <- cell_vector
 rownames(mat) <- gene_vector
-mat@meta.data$x <- coord_x_vector
-mat@meta.data$y <- coord_y_vector
+#mat@meta.data$x <- coord_x_vector
+#mat@meta.data$y <- coord_y_vector
 countsData <- mat
 #####################################################################################
 temp <- CreateSeuratObject(counts = countsData)
@@ -30,7 +30,7 @@ temp <- ScaleData(temp)
 
 temp <- RunPCA(temp, verbose = FALSE)
 temp <- FindNeighbors(temp, reduction = "pca", dims = 1:30)
-temp <- FindClusters(temp)
+temp <- FindClusters(temp, resolution=0.3)
 save(temp, file='/mnt/data1/fatema/IMC_T1D_data1/temp.Rda')
 temp_matrix <- temp[['seurat_clusters']]
 write.csv(temp_matrix, '/mnt/data1/fatema/IMC_T1D_data1/seurat_clusters.csv')
@@ -46,8 +46,8 @@ gene_ids <- read.csv('/mnt/data1/fatema/IMC_mgdf_gad+_gad-sample/protein_marker_
 gene_vector <- gene_ids[, 1]
 colnames(mat) <- cell_vector
 rownames(mat) <- gene_vector
-mat@meta.data$x <- coord_x_vector
-mat@meta.data$y <- coord_y_vector
+#mat@meta.data$x <- coord_x_vector
+#mat@meta.data$y <- coord_y_vector
 countsData <- mat
 #####################################################################################
 temp <- CreateSeuratObject(counts = countsData)
@@ -58,7 +58,7 @@ temp <- ScaleData(temp)
 
 temp <- RunPCA(temp, verbose = FALSE)
 temp <- FindNeighbors(temp, reduction = "pca", dims = 1:30)
-temp <- FindClusters(temp)
+temp <- FindClusters(temp, resolution=0.3)
 save(temp, file='/mnt/data1/fatema/IMC_mgdf_gad+_gad-sample/mgDF_GAD+GAD-temp.Rda')
 temp_matrix <- temp[['seurat_clusters']]
 write.csv(temp_matrix, '/mnt/data1/fatema/IMC_mgdf_gad+_gad-sample/seurat_clusters_mgDF_GAD+GAD-.csv')
@@ -75,8 +75,8 @@ gene_ids <- read.csv('/mnt/data1/fatema/IMC_T1Dsample/protein_marker_T1D.csv', h
 gene_vector <- gene_ids[, 1]
 colnames(mat) <- cell_vector
 rownames(mat) <- gene_vector
-mat@meta.data$x <- coord_x_vector
-mat@meta.data$y <- coord_y_vector
+#mat@meta.data$x <- coord_x_vector
+#mat@meta.data$y <- coord_y_vector
 countsData <- mat
 #####################################################################################
 temp <- CreateSeuratObject(counts = countsData)
