@@ -87,7 +87,7 @@ temp <- ScaleData(temp)
 
 temp <- RunPCA(temp, verbose = FALSE)
 temp <- FindNeighbors(temp, reduction = "pca", dims = 1:30)
-temp <- FindClusters(temp)
+temp <- FindClusters(temp, resolution=0.3)
 save(temp, file='/mnt/data1/fatema/IMC_T1Dsample/T1D-temp.Rda')
 temp_matrix <- temp[['seurat_clusters']]
 write.csv(temp_matrix, '/mnt/data1/fatema/IMC_T1Dsample/seurat_clusters_T1D.csv')
