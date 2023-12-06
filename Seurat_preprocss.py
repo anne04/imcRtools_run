@@ -18,6 +18,19 @@ type_id = 1
 df = pd.read_csv(data2_path_from, sep=",", header=0,index_col=0) 
 # seperate the protein names, (x, y), and cell names
 
+###################################
+df_column_names = list(df.columns)
+df.pop('column-name')
+
+df_clusters = pd.read_csv('', sep=",", header=0,index_col=0) 
+num_cells = len(df_clusters.index)
+cluster_id = []
+for i in range (0, num_cells):
+    cluster_id.append(df_clusters['seurat_clusters'][df_clusters.index[i]])
+    
+df['label']=cluster_id   
+df.to_csv(data2_path_to+'cluster_label_'+type[type_id]+'.csv', index=False, header=False)
+###########################
 cell_name = []
 x_coord = []
 y_coord = []
