@@ -15,13 +15,13 @@ data2_path_from = '/mnt/data1/fatema/IMC_T1D/raw_data/mgDF_GAD+GAD-samples.csv'
 type = ['mgDF', 'mgDF_GAD+GAD-', 'T1D']
 type_id = 0
 
-df = pd.read_csv(data2_path_from, sep=",", header=0,index_col=0) 
+df = pd.read_csv(data1_path_from, sep=",", header=0,index_col=0) 
 # seperate the protein names, (x, y), and cell names
-
+df_column_names = list(df.columns)
 ###################################
 #df_column_names = list(df.columns)
 #df.pop('column-name')
-
+'''
 df_normalized_protein = pd.read_csv('/mnt/data1/fatema/IMC_T1D_data1/normalized_protein.csv', sep=",", header=0,index_col=0) 
 df_normalized_protein = df_normalized_protein.T # now rows are cells and columns are proteins
 
@@ -33,7 +33,7 @@ for i in range (0, num_cells):
     
 df_normalized_protein['label']=cluster_id   
 df_normalized_protein.to_csv(data2_path_to+'cluster_label_'+type[type_id]+'.csv', index=False, header=False)
-
+'''
 ###########################
 cell_name = []
 x_coord = []
@@ -45,7 +45,7 @@ for i in range (0, len(df.index)):
     
 
 protein_name = []
-for i in range (2, len(df.columns)-2):
+for i in range (2, 37):
     protein_name.append(df.columns[i])
 
 file_name = []
