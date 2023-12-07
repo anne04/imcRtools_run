@@ -19,8 +19,11 @@ df = pd.read_csv(data2_path_from, sep=",", header=0,index_col=0)
 # seperate the protein names, (x, y), and cell names
 
 ###################################
-df_column_names = list(df.columns)
-df.pop('column-name')
+#df_column_names = list(df.columns)
+#df.pop('column-name')
+
+df_normalized_protein = pd.read_csv('/mnt/data1/fatema/IMC_T1D_data1/normalized_protein.csv', sep=",", header=0,index_col=0) 
+df_normalized_protein = df_normalized_protein.T # now rows are cells and columns are proteins
 
 df_clusters = pd.read_csv('/mnt/data1/fatema/IMC_T1D_data1/seurat_clusters.csv', sep=",", header=0,index_col=0) 
 num_cells = len(df_clusters.index)
@@ -28,11 +31,8 @@ cluster_id = []
 for i in range (0, num_cells):
     cluster_id.append(df_clusters['seurat_clusters'][df_clusters.index[i]])
     
-df['label']=cluster_id   
-df.to_csv(data2_path_to+'cluster_label_'+type[type_id]+'.csv', index=False, header=False)
-
-df_normalized_protein = pd.read_csv('/mnt/data1/fatema/IMC_T1D_data1/normalized_protein.csv', sep=",", header=0,index_col=0) 
-
+df_normalized_protein['label']=cluster_id   
+df_normalized_protein.to_csv(data2_path_to+'cluster_label_'+type[type_id]+'.csv', index=False, header=False)
 
 ###########################
 cell_name = []
