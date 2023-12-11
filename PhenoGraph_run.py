@@ -18,6 +18,7 @@ data = data.transpose()
 print(data.shape)
 
 df_normalized_protein = pd.read_csv('/mnt/data1/fatema/IMC_T1D_data1/normalized_protein.csv', sep=",", header=0,index_col=0) 
+df_normalized_protein = df_normalized_protein.T # now rows are cells and columns are proteins
 data = df_normalized_protein.values
 communities, graph, Q = phenograph.cluster(data) #higher k = less number of clusters. Default k=30
 
@@ -27,8 +28,7 @@ communities, graph, Q = phenograph.cluster(data) #higher k = less number of clus
 type_id = 2
 # data should be cell vs gene ndarray
 df_normalized_protein = pd.read_csv(data3_path+'normalized_protein_'+ type[type_id] +'.csv', sep=",", header=0,index_col=0) 
-#df_normalized_protein = df_normalized_protein.T # now rows are cells and columns are proteins
-# remove first row and first column
+df_normalized_protein = df_normalized_protein.T # now rows are cells and columns are proteins
 data = df_normalized_protein.values
 print(data.shape)
 communities, graph, Q = phenograph.cluster(data) #higher k = less number of clusters. Default k=30
@@ -37,8 +37,7 @@ communities, graph, Q = phenograph.cluster(data) #higher k = less number of clus
 type_id = 1
 # data should be cell vs gene ndarray
 df_normalized_protein = pd.read_csv(data2_path+'normalized_protein_'+ type[type_id] +'.csv', sep=",", header=0,index_col=0) 
-#df_normalized_protein = df_normalized_protein.T # now rows are cells and columns are proteins
-# remove first row and first column
+df_normalized_protein = df_normalized_protein.T # now rows are cells and columns are proteins
 data = df_normalized_protein.values
 print(data.shape)
-communities, graph, Q = phenograph.cluster(data) #higher k = less number of clusters. Default k=30
+communities, graph, Q = phenograph.cluster(data, k=100) #higher k = less number of clusters. Default k=30
