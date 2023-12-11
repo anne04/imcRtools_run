@@ -21,7 +21,7 @@ df_normalized_protein = pd.read_csv('/mnt/data1/fatema/IMC_T1D_data1/normalized_
 df_normalized_protein = df_normalized_protein.T # now rows are cells and columns are proteins
 data = df_normalized_protein.values
 communities, graph, Q = phenograph.cluster(data) #higher k = less number of clusters. Default k=30
-
+np.save(data1_path+'phenograph_clusters_less_'+type[type_id], communities)
 
 #####################################################################################
 
@@ -32,7 +32,7 @@ df_normalized_protein = df_normalized_protein.T # now rows are cells and columns
 data = df_normalized_protein.values
 print(data.shape)
 communities, graph, Q = phenograph.cluster(data) #higher k = less number of clusters. Default k=30
-
+np.save(data3_path+'phenograph_clusters_less_'+type[type_id], communities)
 ######################################################################################
 type_id = 1
 # data should be cell vs gene ndarray
@@ -41,3 +41,4 @@ df_normalized_protein = df_normalized_protein.T # now rows are cells and columns
 data = df_normalized_protein.values
 print(data.shape)
 communities, graph, Q = phenograph.cluster(data, k=100) #higher k = less number of clusters. Default k=30
+np.save(data2_path+'phenograph_clusters_less_'+type[type_id], communities)
