@@ -13,9 +13,9 @@ data1_path_from = '/mnt/data1/fatema/IMC_T1D/raw_data/mgDF.csv'
 data2_path_from = '/mnt/data1/fatema/IMC_T1D/raw_data/mgDF_GAD+GAD-samples.csv'
 
 type = ['mgDF', 'mgDF_GAD+GAD-', 'T1D']
-type_id = 1
+type_id = 0
 
-df = pd.read_csv(data2_path_from, sep=",", header=0,index_col=0) 
+df = pd.read_csv(data1_path_from, sep=",", header=0,index_col=0) 
 # seperate the protein names, (x, y), and cell names
 df_column_names = list(df.columns)
 ###################################
