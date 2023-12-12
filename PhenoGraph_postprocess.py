@@ -17,11 +17,11 @@ type_id = 0
 df_normalized_protein = pd.read_csv(data1_path_to+'normalized_protein.csv', sep=",", header=0,index_col=0) 
 df_normalized_protein = df_normalized_protein.T # now rows are cells and columns are proteins
 
-clusters = np.load(data1_path_to+'phenograph_clusters_'+type[type_id]+'.npy')  # ? clusters with k = 1000
+clusters = np.load(data1_path_to+'phenograph_clusters_less_'+type[type_id]+'.npy')  # ? clusters with k = 1000
 num_cells = clusters.shape[0]
 cluster_id = []
 for i in range (0, num_cells):
-    cluster_id.append(df_clusters[i])
+    cluster_id.append(clusters[i])
 
 
 df = pd.read_csv('/mnt/data1/fatema/seurat_clusters/mgDF_data/seurat_clusters_mgDF.csv', sep=",", header=0,index_col=0) # 22 clusters with resolution = 0.2
