@@ -98,11 +98,12 @@ with open('/mnt/data1/fatema/out.csv') as file:
 ROI_control_Islet_Islet_ct = dict() # column 3
 box_plot_ct = defaultdict(list)
 ROI_control_ct_distribution = defaultdict(list)
+ROI_Islet_Islet_control = []
 file_name_list = []
 for i in range (1, len(out_histocat)):
     if out_histocat[i][0] in ROI_control:
         if  out_histocat[i][1]== 'Islet_Cells' and out_histocat[i][2]== 'Islet_Cells':
-            
+            ROI_Islet_Islet_control.append(out_histocat[i][0])
             if out_histocat[i][9] != 'NA': #= '1':
                 ROI_control_ct_distribution['Distribution_type'].append('Islet vs Islet cells in Control')
                 ROI_control_ct_distribution['ct'].append(float(out_histocat[i][3]))
@@ -208,10 +209,12 @@ chart.save(save_path+'region_of_interest_filtered_combined_attention_distributio
 ROI_control_Islet_Acinar_ct = dict() # column 3
 ROI_control_ct_distribution = defaultdict(list)
 file_name_list = []
+ROI_Islet_Acinar_control = []
 for i in range (1, len(out_histocat)):
     if out_histocat[i][0] in ROI_control:
+        
         if  (out_histocat[i][1]== 'Islet_Cells' and out_histocat[i][2]== 'Acinar_Cells') or (out_histocat[i][1]=='Acinar_Cells' and out_histocat[i][2]=='Islet_Cells'):
-            
+            ROI_Islet_Acinar_control.append(out_histocat[i][0])
             if out_histocat[i][9] != 'NA': # == '1':
                 ROI_control_ct_distribution['Distribution_type'].append('Islet vs Acinar cells in Control')
                 ROI_control_ct_distribution['ct'].append(float(out_histocat[i][3]))
